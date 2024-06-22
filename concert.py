@@ -1,6 +1,7 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from datetime import datetime
+from pprint import pprint
 
 # Get the current datetime
 
@@ -26,13 +27,20 @@ def signup(user,password):
     id_str = now.strftime("%Y%m%d%H%M%S")
     result = concert_collection.insert_one({"id":id_str,"name": user, "password": password,"ticket":[]})
     print(True)
+
 def getconcert (id):
     db = client['ManageAsset']
     concert_collection = db['Concert']
-    result = concert_collection.find({"id":id})
+    result = concert_collection.find_one({"id":id})
     return result
+
 def getRecommentByLocation(location):
-    db.Concert.find({ location: location }).pretty();
+    db = client['ManageAsset']
+    concert_collection = db['Concert']
+    results = concert_collection.find({"location": location})
+    for concert in results:
+        pprint(concert)
+    return results
 
 def comment(id_user ,id):
     db = client['ManageAsset']
@@ -62,7 +70,14 @@ def dashboard(user):
             case 1:
                 print("Mua Vé")
                 id = input("Nhap id concert: ")
+                print("Recomemt concert")
                 concert = getconcert(id)
+                if concert:
+                    location = concert.get("location")
+                    print(f"Các concert tại {location}:")
+                    getRecommentByLocation(location)
+                else:
+                    print("Không tìm thấy concert")
                 
             case 2:
                 print("Xem vé đã mua")
@@ -76,10 +91,15 @@ def dashboard(user):
                     print("__________________________________________________")
 
             case 3:
-                print("Đăng Nhập")
-                username = input("username: ")
-                password = input("password: ")
-                signin(username,password)
+                print("Đề xuất concert theo địa điểm")
+                id = input("Nhập id concert: ")
+                concert = getconcert(id)
+                if concert:
+                    location = concert.get("location")
+                    print(f"Các concert tại {location}:")
+                    getRecommentByLocation(location)
+                else:
+                    print("Không tìm thấy concert")
 
             case 4:
                 print("Nhap concert muốn comment")
