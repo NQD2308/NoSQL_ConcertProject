@@ -31,6 +31,8 @@ def getconcert (id):
     concert_collection = db['Concert']
     result = concert_collection.find({"id":id})
     return result
+def getRecommentByLocation(location):
+    db.Concert.find({ location: location }).pretty();
 
 def comment(id_user ,id):
     db = client['ManageAsset']
